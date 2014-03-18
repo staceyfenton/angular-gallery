@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html ng-app="assetApp" lang="en" class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>JavaScript Asset Application</title>
+	<link rel="stylesheet" type="text/css" href="css/base.css" />
+	<link rel="stylesheet" type="text/css" href="css/styles.css" />
+	<script>document.getElementsByTagName("html")[0].className = "js";</script>
+</head>
+
+<body>
+	
+	<header>
+		<h1>Angular Photo Gallery</h1>
+	</header>
+	
+	<noscript><p>Please enable JavaScript in your browser to view the contents of this page.</p></noscript>
+	
+	<ul class="asset-list" ng-controller="assetController" ng-class="{fadein:assets.length}">
+		<li class="col-xs-6 col-sm-4 col-md-4 col-lg-3" ng-repeat="asset in assets">
+			<a href="{{filepath+asset.src}}" ng-click="asset.selected=!asset.selected"><img ng-src="{{filepath+asset.src}}" alt="{{asset.title}}" ></a>
+			<div class="meta-data" ng-show="asset.selected" ng-click="asset.selected=!asset.selected">
+				<a href="/" class="btn-close">Close</a>
+				<h1>{{asset.title}}</h1>
+				<p>{{asset.desc}}</p>
+				<p>Filesize: {{asset.filesize}}</p>
+				<img ng-src="{{filepath+asset.src}}" alt="{{asset.title}}" >
+			</div>
+		</li>
+	</ul>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/angular.js"></script>
+	<script>
+		angular.module('assetApp',[]).
+		factory('DataSource', ['$http',function($http){
+		   return {
+			   get: function(fileName,callback){
+					$http.get(fileName).
+					success(function(data, status) {
+						callback(data);
+					});
+			   }
+		   };
+		}]);
+		
+		// Retrieve and set data 
+		var assetController = function($scope,DataSource) {
+			$scope.filepath = "images/";
+			DataSource.get("images.json",function(data) {
+				$scope.assets = data;
+
+			});
+		}
+		
+		$(function() {
+			// Prevent default click action
+			$(document).on('click', 'a', function(e) {
+				e.preventDefault();
+			});
+		});
+	</script>
+</body>	
+</html>
